@@ -1,16 +1,12 @@
 import pytest
 import requests
 
-@pytest.fixture(params=["ditto", "pikachu", "appletun", "torkoal"])
-def working_pokemon(request):
-  return request.param
-
-def test_ok_status(working_pokemon):
-  r = requests.get(f"https://pokeapi.co/api/v2/pokemon/{working_pokemon}")
+def test_ok_status(working_pokemon_names):
+  r = requests.get(f"https://pokeapi.co/api/v2/pokemon/{working_pokemon_names}")
   assert r.status_code == 200
 
-def test_api_requests_reasonable_speed(working_pokemon):
-  r = requests.get(f"https://pokeapi.co/api/v2/pokemon/{working_pokemon}")
+def test_api_requests_reasonable_speed(working_pokemon_names):
+  r = requests.get(f"https://pokeapi.co/api/v2/pokemon/{working_pokemon_names}")
   assert r.elapsed.seconds < 2.0
 
 def test_not_real_pokemon_status():
