@@ -34,21 +34,12 @@ def test_get_414_from_string_too_long():
   r = requests.get(f"https://pokeapi.co/api/v2/pokemon/{"".join(["a" for i in range(0, 10000)])}")
   assert r.status_code == 414
 
-def test_get_nested_species_url(pikachu):
-  r = requests.get(pikachu["species"]["url"])
-  assert r.status_code == 200
+def test_get_nested_species_url(working_pokemon_names):
+  pokemon = requests.get(f"https://pokeapi.co/api/v2/pokemon/{working_pokemon_names}").json()
+  inner_request = requests.get(pokemon["species"]["url"])
+  assert inner_request.status_code == 200
 
 @pytest.mark.parametrize("special_character", ["⚡", "%20", "!?", "%00"])
 def test_get_404_from_special_characters(special_character):
   r = requests.get(f"https://pokeapi.co/api/v2/pokemon/{special_character}")
   assert r.status_code == 400
-
-async def test_rate_limiting():
-  async def fetch(url):
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url)
-        return response
-  
-  calls = asyncio.gather(
-    httpx.get("https://pokeapi.co/api/v2/pokemon/pikachu")
-  )
