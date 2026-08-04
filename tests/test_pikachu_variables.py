@@ -1,13 +1,12 @@
-import pytest
-import requests
-from models.pokemon import Pokemon
 from models.ability import Ability, AbilityDetail
+from models.pokemon import Pokemon
+
 
 def test_get_pikachu(pikachu):
   expected = Pokemon(
-    id=25, 
-    name="pikachu", 
-    height=4, 
+    id=25,
+    name="pikachu",
+    height=4,
     weight=60,
     abilities=[
       Ability(

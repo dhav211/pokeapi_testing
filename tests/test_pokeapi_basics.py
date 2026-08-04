@@ -1,5 +1,5 @@
-import pytest
 import requests
+
 
 def test_check_content_type_is_json(working_pokemon_names):
   r = requests.get(f"https://pokeapi.co/api/v2/pokemon/{working_pokemon_names}")

@@ -1,7 +1,6 @@
 import pytest
 import requests
-import httpx
-import asyncio
+
 
 def test_ok_status(working_pokemon_names):
   r = requests.get(f"https://pokeapi.co/api/v2/pokemon/{working_pokemon_names}")

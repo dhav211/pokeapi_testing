@@ -1,6 +1,8 @@
 import pytest
 import requests
+
 from models.pokemon import Pokemon
+
 
 @pytest.fixture(scope="session")
 def pikachu():
