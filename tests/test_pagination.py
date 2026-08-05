@@ -1,3 +1,5 @@
+from math import floor
+
 import pytest
 import requests
 
@@ -42,3 +44,54 @@ def test_last_page():
     
     assert len(last_page["results"]) < limit
     assert last_page["next"] is None
+
+def test_too_high_offset():
+    r = requests.get("https://pokeapi.co/api/v2/pokemon?offset=9999999").json()
+    assert len(r["results"]) == 0
+
+@pytest.mark.parametrize("negative_offsets", [-2, -5, -10, -30, -50, -100, -1351])
+def test_negative_limits(negative_offsets):
+    """Negative offset will only work if the absolute value of the negative offset is at least one lower"""
+    request_with_results = requests.get(f"https://pokeapi.co/api/v2/pokemon?offset={negative_offsets}&limit={abs(negative_offsets)-1}").json()
+    request_without_results = requests.get(f"https://pokeapi.co/api/v2/pokemon?offset={negative_offsets}&limit={abs(negative_offsets)}").json()
+
+    assert len(request_with_results["results"]) == abs(negative_offsets)-1
+    assert len(request_without_results["results"]) == 0
+
+@pytest.mark.parametrize("non_number", ["abc", "😀", "a5"])
+def test_non_number_limits(non_number):
+    r = requests.get(f"https://pokeapi.co/api/v2/pokemon?limit={non_number}")
+
+    assert r.status_code == 200
+    assert len(r.json()["results"]) == 20
+
+@pytest.mark.parametrize("decimal", [1.5, 3.3, 9.6, 10.000000001, 9.999999999999999])
+def test_decimal_limits(decimal):
+    r = requests.get(f"https://pokeapi.co/api/v2/pokemon?limit={decimal}").json()
+    assert len(r["results"]) == floor(decimal)
+
+@pytest.mark.parametrize("number_letter", ["1a", "5a4", "14z55d22"])
+def test_numbers_with_letters_limits(number_letter):
+    extracted_number = []
+    for c in number_letter:
+        if c.isdigit():
+            extracted_number.append(c)
+        elif c.isalpha():
+            break
+
+    r = requests.get(f"https://pokeapi.co/api/v2/pokemon?limit={number_letter}").json()
+
+    assert len(r["results"]) == int("".join(extracted_number))
+
+def test_next_and_previous_urls():
+    initial_url = "https://pokeapi.co/api/v2/pokemon?offset=40&limit=20"
+    r = requests.get(initial_url).json()
+    
+    next_request = requests.get(r["next"])
+    previous_request = requests.get(r["previous"])
+
+    assert next_request.status_code == 200
+    assert previous_request.status_code == 200
+    assert next_request.json()["previous"] == previous_request.json()["next"]
+    assert next_request.json()["previous"] == initial_url
+    assert previous_request.json()["next"] == initial_url
