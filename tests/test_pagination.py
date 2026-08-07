@@ -1,5 +1,4 @@
 from math import floor
-from mimetypes import init
 
 import pytest
 import requests
