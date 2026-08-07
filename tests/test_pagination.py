@@ -1,4 +1,5 @@
 from math import floor
+from mimetypes import init
 
 import pytest
 import requests
@@ -41,7 +42,7 @@ def test_last_page():
     offset = r["count"] - 5
     limit = 20
     last_page = requests.get(f"https://pokeapi.co/api/v2/pokemon?offset={offset}&limit={limit}").json()
-    
+
     assert len(last_page["results"]) < limit
     assert last_page["next"] is None
 
@@ -86,7 +87,7 @@ def test_numbers_with_letters_limits(number_letter):
 def test_next_and_previous_urls():
     initial_url = "https://pokeapi.co/api/v2/pokemon?offset=40&limit=20"
     r = requests.get(initial_url).json()
-    
+
     next_request = requests.get(r["next"])
     previous_request = requests.get(r["previous"])
 
@@ -95,3 +96,19 @@ def test_next_and_previous_urls():
     assert next_request.json()["previous"] == previous_request.json()["next"]
     assert next_request.json()["previous"] == initial_url
     assert previous_request.json()["next"] == initial_url
+
+def test_no_duplicate_results(count):
+    assert len(create_pokemon_set("https://pokeapi.co/api/v2/pokemon?offset=0&limit=250", set())) == count
+
+def create_pokemon_set(url, pokemon_set, call_depth = 0):
+    if call_depth > 10:
+        pytest.fail("Recursion call stack too deep, stopping recursion")
+
+    r = requests.get(url).json()
+    for result in r["results"]:
+        pokemon_set.add(result["name"])
+    if r["next"] is None:
+        return pokemon_set
+    else:
+        call_depth += 1
+        return create_pokemon_set(r["next"], pokemon_set, call_depth)

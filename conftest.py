@@ -3,6 +3,10 @@ import requests
 
 from models.pokemon import Pokemon
 
+@pytest.fixture(scope="session")
+def count():
+    r = requests.get("https://pokeapi.co/api/v2/pokemon").json()
+    return r["count"]
 
 @pytest.fixture(scope="session")
 def pikachu():
