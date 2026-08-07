@@ -8,7 +8,7 @@ def test_ok_status(working_pokemon_names):
 
 def test_api_requests_reasonable_speed(working_pokemon_names):
   r = requests.get(f"https://pokeapi.co/api/v2/pokemon/{working_pokemon_names}")
-  assert r.elapsed.seconds < 2.0
+  assert r.elapsed.total_seconds() < 2.0
 
 def test_not_real_pokemon_status():
   r = requests.get("https://pokeapi.co/api/v2/pokemon/dibbo")
