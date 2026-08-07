@@ -1,4 +1,4 @@
-![Tests](https://github.com/dhav211/pokeapi_testing/actions/workflows/tests.yml/badge.svg)
+[![Tests](https://github.com/dhav211/pokeapi_testing/actions/workflows/tests.yaml/badge.svg)](https://github.com/dhav211/pokeapi_testing/actions/workflows/tests.yaml)
 
 # What is this?
 This is my attempt to learn more about API testing with python, pytest, and requests. It serves no practical real world solution other than education, which I suppose would be a solution to most the worlds problems. I was going through Brian Okken's excellent book titled "Python Testing with pytest" so as I learnt about fixtures, I would add a fixture. It really cemented my knowledge of what I was learning.
